@@ -27,7 +27,7 @@ func main() {
 
 	frequencies := []int64{1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600}
 	for i := 0; i < len(frequencies); i++ {
-		err := powermanager.SetPowerProfileToNode(util.Node1Name, util.HighFrequencyPowerProfile, frequencies[i])
+		err := powermanager.SetPowerProfileToNode(util.Node1Name, util.HighFrequencyPowerProfile, frequencies[i], frequencies[i])
 		if err != nil {
 			fmt.Printf(fmt.Sprintf("Error setting up power profile: %+v", err))
 		}

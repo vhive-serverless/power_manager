@@ -5,6 +5,7 @@
 2. 4 vSwarm benchmarks are used to run the experiments. On master node, deploy these benchmarks on the Knative cluster.
     ```bash
     git clone --depth=1 https://github.com/vhive-serverless/vSwarm.git
+    git clone -b add_power_manager https://github.com/vhive-serverless/vhive.git
 
     cd $HOME/vSwarm/tools/test-client && go build ./test-client.go
 
