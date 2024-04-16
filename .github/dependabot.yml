@@ -1,0 +1,17 @@
+# Use https://dependabot.com/docs/config-file/validator/ to check for errors.
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-patch" ]
+
+  # Enable version updates for Actions
+  - package-ecosystem: "github-actions"
+    # Look for `.github/workflows` in the `root` directory
+    directory: "/"
+    schedule:
+      interval: "weekly"
