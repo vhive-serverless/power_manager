@@ -1,4 +1,4 @@
-package powermanager
+package main
 
 import (
 	"encoding/csv"
@@ -97,6 +97,8 @@ func main() {
 	ch_latency_sleeping := make(chan int64)
 
 	var wg sync.WaitGroup
+	var wgConcurrent sync.WaitGroup
+
 	wg.Add(3)
 	go powermanager_util.WriteToCSV(writer, ch, &wg)
 	go assignWorkload(ch_latency_spinning, "spinning-go", &wg)
@@ -104,11 +106,14 @@ func main() {
 
 	now := time.Now()
 	for time.Since(now) < (time.Minute * 5) {
-		go powermanager_util.InvokeConcurrently(5, powermanager_util.SleepingURL, ch, ch_latency_spinning, ch_latency_sleeping, false)
-		go powermanager_util.InvokeConcurrently(5, powermanager_util.SpinningURL, ch, ch_latency_spinning, ch_latency_sleeping, true)
+		wgConcurrent.Add(10)
+		go powermanager_util.InvokeConcurrently(5, powermanager_util.SleepingURL, ch, ch_latency_spinning, ch_latency_sleeping, false, &wgConcurrent)
+		go powermanager_util.InvokeConcurrently(5, powermanager_util.SpinningURL, ch, ch_latency_spinning, ch_latency_sleeping, true, &wgConcurrent)
 
 		time.Sleep(1 * time.Second) // Wait for 1 second before invoking again
 	}
+
+	wgConcurrent.Wait()
 	close(ch)
 	close(ch_latency_spinning)
 	close(ch_latency_sleeping)

@@ -31,6 +31,8 @@ func main() {
 	ch_latency_sleeping := make(chan int64)
 
 	var wg sync.WaitGroup
+	var wgConcurrent sync.WaitGroup
+
 	wg.Add(1)
 	go util.WriteToCSV(writer, ch, &wg)
 
@@ -51,8 +53,10 @@ func main() {
 
 		now := time.Now()
 		for time.Since(now) < (time.Minute * 5) {
-			go util.InvokeConcurrently(5, util.SleepingURL, ch, ch_latency_spinning, ch_latency_sleeping, false)
-			go util.InvokeConcurrently(5, util.SpinningURL, ch, ch_latency_spinning, ch_latency_sleeping, true)
+			wgConcurrent.Add(10) 
+			
+			go util.InvokeConcurrently(5, util.SleepingURL, ch, ch_latency_spinning, ch_latency_sleeping, false, &wgConcurrent)
+			go util.InvokeConcurrently(5, util.SpinningURL, ch, ch_latency_spinning, ch_latency_sleeping, true, &wgConcurrent)
 
 			time.Sleep(1 * time.Second) // Wait for 1 second before invoking again
 		}
@@ -61,10 +65,14 @@ func main() {
 		if err != nil {
 			fmt.Printf("Error writing metrics to the CSV file: %v\n", err)
 		}
+		time.Sleep(1 * time.Second) 
 	}
+	wgConcurrent.Wait() // Wait for all invocation goroutines to complete
+
 	close(ch)
 	close(ch_latency_spinning)
 	close(ch_latency_sleeping)
+
 	wg.Wait()
 	fmt.Println("done")
 }

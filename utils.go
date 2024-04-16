@@ -1,4 +1,4 @@
-package powermanager
+package power_manager
 
 import (
 	"encoding/csv"
@@ -34,9 +34,10 @@ func Invoke(url string) (int64, int64, int64, error) {
 	return startInvoke, endInvoke, latency , nil
 }
 
-func InvokeConcurrently(n int, url string, ch chan<- []string, ch_latency_spinning chan<- int64, ch_latency_sleeping chan<- int64, spinning bool) {
+func InvokeConcurrently(n int, url string, ch chan<- []string, ch_latency_spinning chan<- int64, ch_latency_sleeping chan<- int64, spinning bool, wg *sync.WaitGroup) {
 	for i := 0; i < n; i++ {
 		go func() {
+			defer wg.Done()
 			startInvoke, endInvoke, latency, err := Invoke(url)
 			if err != nil {
 				fmt.Printf("Error invoking benchmark: %v\n", err)
