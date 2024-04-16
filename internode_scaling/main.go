@@ -31,7 +31,7 @@ func main() {
 	ch_latency_sleeping := make(chan int64)
 
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(1)
 	go util.WriteToCSV(writer, ch, &wg)
 
 	frequencies := map[string]int64{
@@ -56,15 +56,15 @@ func main() {
 
 			time.Sleep(1 * time.Second) // Wait for 1 second before invoking again
 		}
-		close(ch)
-		close(ch_latency_spinning)
-		close(ch_latency_sleeping)
-		wg.Wait()
 
 		err = writer.Write(append([]string{"-", "-", "-", "-"}))
 		if err != nil {
 			fmt.Printf("Error writing metrics to the CSV file: %v\n", err)
 		}
-		fmt.Println("done")
 	}
+	close(ch)
+	close(ch_latency_spinning)
+	close(ch_latency_sleeping)
+	wg.Wait()
+	fmt.Println("done")
 }
