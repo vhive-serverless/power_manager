@@ -52,7 +52,7 @@ func main() {
 		}
 
 		now := time.Now()
-		for time.Since(now) < (time.Minute * 5) {
+		for time.Since(now) < (time.Minute * 1) {
 			wgConcurrent.Add(10) 
 			
 			go util.InvokeConcurrently(5, util.SleepingURL, ch, ch_latency_spinning, ch_latency_sleeping, false, &wgConcurrent)
@@ -66,6 +66,7 @@ func main() {
 			fmt.Printf("Error writing metrics to the CSV file: %v\n", err)
 		}
 		time.Sleep(1 * time.Second) 
+		fmt.Println("done")
 	}
 	wgConcurrent.Wait() // Wait for all invocation goroutines to complete
 
@@ -74,5 +75,4 @@ func main() {
 	close(ch_latency_sleeping)
 
 	wg.Wait()
-	fmt.Println("done")
 }
